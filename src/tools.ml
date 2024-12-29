@@ -17,3 +17,8 @@ let gmap gr f=
 ;;
 
 
+let bfs gr s p=
+let file =[s] in
+
+;;
+
