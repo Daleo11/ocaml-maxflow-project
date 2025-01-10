@@ -29,4 +29,18 @@ in
 boucle file visited
 ;;
 
+let rec recup_nodes_gr gr acu=match gr with
+|(id,_)::rest->recup_nodes_gr	rest (id::acu)
+|[]->acu;;
+
+let rec recup_node_visited visited node=
+match visited with
+|[]->[]
+| (n,p)::rest -> if (n=node) then (n,p)::rest else recup_node_visited rest node;;
+
+(*on met pas la source car c'est la meme pour tt l'algo*)
+let rec chemin visited d=
+let (d2,p2)<-recup_node_visited visited d in
+(d2,p2)::chemin visited d2
+
 (*floyd*)
