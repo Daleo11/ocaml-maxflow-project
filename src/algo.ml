@@ -1,4 +1,5 @@
 open Graph
+open Tools
 
 let rec list_node_dest arcliste acu=
 match arcliste with
@@ -58,7 +59,13 @@ match liste with
 
 (*floyd*)
 
-let recup label gr s d=(find_arc gr s d).lbl;;
+let rec trouve_arc gr ids idd=
+match gr with
+|[]->{src=ids;tgt=idd;lbl=0}  
+|(_,{src=id;tgt=id2;lbl=a})::rest->if ((id=ids) && (id2=idd)) then {src=id;tgt=id2;lbl=a} else trouve_arc rest ids idd
+
+;;
+let recup_label gr s d=(trouve_arc gr s d).lbl;;
 
 let floyd gr s p=
   let liste_node=recup_nodes_gr gr [] in
