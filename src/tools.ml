@@ -16,9 +16,3 @@ let gmap gr f=
   e_fold gr transfo (clone_nodes gr)
 ;;
 
-
-let bfs gr s p=
-let file =[s] in
-
-;;
-
