@@ -6,24 +6,25 @@ match arcliste with
 |{src=ids;tgt=idd;_}::rest->list_node_dest rest ((idd,ids)::acu)
 ;;
 
-let rec is_visited node visited=
+let rec is_visited (node,prec:id*id) (visited:(id*id)list)=
 match visited with
 | [] -> false
-| (n,p)::rest -> (n=node) || (is_visited node rest);;
+| (n,p)::rest -> (n=node) || (is_visited (node,prec) rest);;
 
 (*parcours en largeur, graph source puit*)
 
 let bfs gr s p=
 let file =[(s,-1)] in
 let visited=[]in
-let rec action liste_n file visited =
+let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
   match liste_n with
   |[]->file
   |e::rest-> if (is_visited e visited)=false then (action rest (e::file) visited) else action rest file visited
 in
 let rec boucle file visited =
   match file with
-  |(n,p)::rest ->boucle ((action (list_node_dest (out_arcs gr n) []) file ( (n,p)::visited ) )::rest) (n,p)::visited
+  |(n,p)::rest ->let nv_file=action (list_node_dest (out_arcs gr n) []) file ((n,p)::visited) in
+                boucle (nv_file@rest) ((n,p)::visited)
   |[]->visited
 in
 boucle file visited
@@ -43,7 +44,7 @@ let chemin visited d=
 let res=[]in
 let rec boucle_while liste node_prec = 
     match node_prec with
-    |(x,y)->if x=y then liste else (boucle_while ((x,y)::liste) (recup_node_visited y)) 
+    |(x,y)->if x=y then liste else (boucle_while ((x,y)::liste) (recup_node_visited visited y) )
 in
 (d2,p2)=recup_node_visited visited d
 
