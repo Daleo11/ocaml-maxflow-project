@@ -9,7 +9,7 @@ match arcliste with
 let rec is_visited node visited=
 match visited with
 | [] -> false
-| (n,p)::rest -> (n=node) || (is_visited node rest)
+| (n,p)::rest -> (n=node) || (is_visited node rest);;
 
 (*parcours en largeur, graph source puit*)
 
@@ -35,17 +35,27 @@ let rec recup_nodes_gr gr acu=match gr with
 
 let rec recup_node_visited visited node=
 match visited with
-|[]->[]
+|[]->(n,n)
 | (n,p)::rest -> if (n=node) then (n,p) else recup_node_visited rest node;;
 
 (*on met pas la source car c'est la meme pour tt l'algo*)
-let rec chemin visited d=
-let (d2,p2)=recup_node_visited visited d in
-(d2,p2)::chemin visited d2
+let chemin visited d=
+let res=[]in
+(d2,p2)=recup_node_visited visited d
+while d2<>p2 do
+  res=(d2,p2)::res;
+  (d2,p2)=recup_node_visited visited d
+done
+res;;
+
+let rec reverseliste liste acu=
+match liste with
+|[]->acu
+|e::rest->reverseliste rest (e::acu);;
 
 (*floyd*)
 
-let recup label gr s d=(find_arc gr s d).lbl
+let recup label gr s d=(find_arc gr s d).lbl;;
 
 let floyd gr s p=
   let liste_node=recup_nodes_gr gr [] in
@@ -77,16 +87,14 @@ in
     |(n,p)::rest->val_min rest (min v_min (abs (find_arc gr_flot p n).lbl) )
 in
 gr_flot=boucle_flot gr_flot gr2 liste_node
-parcours=chemin (bfs gr_flot s p) p
+parcours= reverseliste (chemin (bfs gr_flot s p) p) []
 while parcours <> [] do
-  begin
     valeur=val_min parcours max_int gr_flot;
     gr2=boucle_parcours parcours valeur gr2;
     gr_flot=boucle_flot (clone_nodes gr2) gr2 liste_node;
-    parcours=chemin (bfs gr_flot s p) p;
-  end
+    parcours=reverseliste (chemin (bfs gr_flot s p) p) [];
 done
-gr2
+gr2;;
 
 
 
