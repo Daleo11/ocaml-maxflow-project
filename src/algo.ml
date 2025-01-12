@@ -3,7 +3,7 @@ open Graph
 let rec list_node_dest arcliste acu=
 match arcliste with
 | [] -> acu
-|{ids,idd,_}::rest->list_node_dest rest ((idd,ids)::acu)
+|{src=ids;tgt=idd;_}::rest->list_node_dest rest ((idd,ids)::acu)
 ;;
 
 let rec is_visited node visited=
@@ -16,14 +16,14 @@ match visited with
 let bfs gr s p=
 let file =[(s,-1)] in
 let visited=[]in
-let action liste_n file visited =
+let rec action liste_n file visited =
   match liste_n with
   |[]->file
-  |e::rest-> if (is_visited e visited)=false then e::file
+  |e::rest-> if (is_visited e visited)=false then (action rest (e::file) visited) else action rest file visited
 in
-let boucle file visited =
+let rec boucle file visited =
   match file with
-  |(n,p)::rest ->boucle (action (list_node_dest (rest.out_arcs))) file ((n,p)::visited) (n,p)::visited
+  |(n,p)::rest ->boucle ((action (list_node_dest (out_arcs gr n) []) file ( (n,p)::visited ) )::rest) (n,p)::visited
   |[]->visited
 in
 boucle file visited
@@ -41,12 +41,14 @@ match visited with
 (*on met pas la source car c'est la meme pour tt l'algo*)
 let chemin visited d=
 let res=[]in
+let rec boucle_while liste node_prec = 
+    match node_prec with
+    |(x,y)->if x=y then liste else (boucle_while ((x,y)::liste) (recup_node_visited y)) 
+in
 (d2,p2)=recup_node_visited visited d
-while d2<>p2 do
-  res=(d2,p2)::res;
-  (d2,p2)=recup_node_visited visited d
-done
-res;;
+
+boucle_while [(d2,p2)] recup_node_visited p2
+;;
 
 let rec reverseliste liste acu=
 match liste with
@@ -64,8 +66,8 @@ let floyd gr s p=
   let rec boucle_arc liste_arc gr_flot gr=
     match liste_arc with
     |[]->gr_flot
-    |{ids,idd,lbla}::rest->begin
-      let valeur=(find_arc gr ids idd).lbl - lbla in ;
+    |{ids;idd;lbla}::rest->begin
+      let valeur=(find_arc gr ids idd).lbl - lbla in 
       if valeur <> 0 then gr_flot=add_arc gr_flot ids idd valeur;
       if lbla <> 0 then gr_flot=add_arc gr_flot idd ids (-lbla);
       boucle_arc rest gr_flot gr;
@@ -86,15 +88,20 @@ in
     |[]->v_min
     |(n,p)::rest->val_min rest (min v_min (abs (find_arc gr_flot p n).lbl) )
 in
-gr_flot=boucle_flot gr_flot gr2 liste_node
-parcours= reverseliste (chemin (bfs gr_flot s p) p) []
-while parcours <> [] do
-    valeur=val_min parcours max_int gr_flot;
+let rec boucle_while parcours gr2 gr_flot s p=
+if parcours <>[] then begin  
+    let valeur=val_min parcours max_int gr_flot in
     gr2=boucle_parcours parcours valeur gr2;
     gr_flot=boucle_flot (clone_nodes gr2) gr2 liste_node;
     parcours=reverseliste (chemin (bfs gr_flot s p) p) [];
-done
-gr2;;
+    boucle_while parcours gr2 gr_flot s p;
+end
+gr2
+in
+gr_flot=boucle_flot gr_flot gr2 liste_node
+parcours= reverseliste (chemin (bfs gr_flot s p) p) []
+boucle_while parcours gr2 gr_flot s p
+;;
 
 
 
