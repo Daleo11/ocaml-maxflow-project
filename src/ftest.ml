@@ -29,7 +29,9 @@ let () =
   let graph = from_file infile in
 
   (* Rewrite the graph that has been read. *)
-  let () = write_file outfile graph in
+  (*let () = write_file outfile graph in
 
-  ()
-
+  ()*)
+  let gr_sortie=floyd graph _source _sink in
+  let () = write_file outfile gr_sortie in
+  () ;;
