@@ -36,7 +36,7 @@ let rec recup_nodes_gr gr acu=match gr with
 
 let rec recup_node_visited visited node=
 match visited with
-|[]->(n,n)
+|[]->(node,node)
 | (n,p)::rest -> if (n=node) then (n,p) else recup_node_visited rest node;;
 
 (*on met pas la source car c'est la meme pour tt l'algo*)
@@ -46,9 +46,9 @@ let rec boucle_while liste node_prec =
     match node_prec with
     |(x,y)->if x=y then liste else (boucle_while ((x,y)::liste) (recup_node_visited visited y) )
 in
-(d2,p2)=recup_node_visited visited d
+let (d2,p2)=recup_node_visited visited d in
 
-boucle_while [(d2,p2)] recup_node_visited p2
+boucle_while [(d2,p2)] (recup_node_visited visited p2)
 ;;
 
 let rec reverseliste liste acu=
