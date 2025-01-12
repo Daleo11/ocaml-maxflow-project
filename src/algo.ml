@@ -67,14 +67,14 @@ match gr with
 ;;
 let recup_label gr s d=(trouve_arc gr s d).lbl;;
 
-let floyd gr s p=
+let floyd (gr:(id* 'a arc list)list) s p=
   let liste_node=recup_nodes_gr gr [] in
-  let gr2=gr in
+  let gr2=gmap gr (fun x->0) in
   let gr_flot=clone_nodes gr2 in
   let rec boucle_arc liste_arc gr_flot gr=
     match liste_arc with
     |[]->gr_flot
-    |{ids;idd;lbla}::rest->begin
+    |{src=ids;tgt=idd;lbl=lbla}::rest->begin
       let valeur=(find_arc gr ids idd).lbl - lbla in 
       if valeur <> 0 then gr_flot=add_arc gr_flot ids idd valeur;
       if lbla <> 0 then gr_flot=add_arc gr_flot idd ids (-lbla);
