@@ -37,6 +37,7 @@ let () =
   
   let gr_sortie=floyd (gmap graph int_of_string) _source _sink in
   let () = write_file outfile (gmap gr_sortie string_of_int) in
+  let ()=export (gmap gr_sortie string_of_int) _source _sink gr_sortie in
   () ;;
  (*
 Printf.printf("avant l'erreur \n");
