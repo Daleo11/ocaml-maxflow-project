@@ -42,11 +42,6 @@ let () =
 Printf.printf("avant l'erreur \n");
 let visited=bfs (gmap graph int_of_string) 0 in
 Printf.printf("je suis ici");
-let rec aff_visited v=
-match v with
-|(n,_)::rest->Printf.printf "%d " n ; aff_visited rest
-|[]->Printf.printf " "
-in
 aff_visited visited;
 ()
 ;;

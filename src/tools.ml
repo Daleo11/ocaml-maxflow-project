@@ -16,3 +16,9 @@ let gmap gr f=
   e_fold gr transfo (clone_nodes gr)
 ;;
 
+let rec aff_visited v=
+match v with
+|(n,p)::rest->Printf.printf "( %d , %d )" n p; aff_visited rest
+|[]->Printf.printf "\n"
+;;
+
