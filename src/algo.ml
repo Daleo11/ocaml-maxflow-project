@@ -8,9 +8,10 @@ match arcliste with
 ;;
 
 let rec is_visited (node,prec:id*id) (visited:(id*id)list)=
+
 match visited with
 | [] -> false
-| (n,_)::rest -> (n=node) || (is_visited (node,prec) rest);;
+| (n,_)::rest ->(n=node) || (is_visited (node,prec) rest);;
 
 (*parcours en largeur, graph source puit*)
 
@@ -20,16 +21,16 @@ let visited=[(s,-1)]in
 Printf.printf("init des var\n");
 let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
 Printf.printf("Dans action\n");
-aff_visited visited;
-
+aff_visited visited; 
+aff_visited liste_n;
 match liste_n with
   |[]->file
-  |e::rest-> if (is_visited e visited)=false then (action rest (e::file) (e::visited)) else action rest file visited
+  |(n,p)::rest-> Printf.printf" (%d , %d)-> %b\n  " n p (is_visited (n,p) visited) ;if (is_visited (n,p) visited)=false then (action rest ((n,p)::file) ((n,p)::visited)) else action rest file visited
 in
 let rec boucle file visited =
   Printf.printf("Dans la boucle\n");
   match file with
-  |(n,p)::rest ->let nv_file=action (list_node_dest (out_arcs gr n) []) file visited in
+  |(n,p)::rest ->let nv_file=action (list_node_dest (out_arcs gr n) []) [] visited in
                 boucle (nv_file@rest) ((n,p)::visited)
   |[]->visited
 in
