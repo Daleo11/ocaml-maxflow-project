@@ -1,5 +1,6 @@
 open Graph
 open Tools
+open Gfile
 
 let rec list_node_dest arcliste acu=
 match arcliste with
@@ -16,8 +17,8 @@ match visited with
 (*parcours en largeur, graph source puit*)
 
 let bfs gr s=
-let file =[(s,-1)] in
-let visited=[(s,-1)]in
+let file =[(s,s)] in
+let visited=[(s,s)]in
 (*Printf.printf("init des var\n");*)
 let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
 (*Printf.printf("Dans action\n");
@@ -51,13 +52,14 @@ match visited with
 
 (*on met pas la source car c'est la meme pour tt l'algo*)
 let chemin visited d=
+Printf.printf("dans chemin");
+aff_visited visited;
 let rec boucle_while liste node_prec = 
     match node_prec with
     |(x,y)->if x=y then liste else (boucle_while ((x,y)::liste) (recup_node_visited visited y) )
 in
 let (d2,p2)=recup_node_visited visited d in
-
-boucle_while [(d2,p2)] (recup_node_visited visited p2)
+if d2=p2 then [] else boucle_while [(d2,p2)] (recup_node_visited visited p2)
 ;;
 
 let rec reverseliste liste acu=
@@ -69,8 +71,8 @@ match liste with
 
 let trouve_arc gr ids idd=
 match (find_arc gr ids idd) with
-  |None->{src=idd ;tgt=idd ;lbl=0}
-  |Some arci-> {src=arci.src ;tgt=arci.tgt ;lbl=arci.lbl};;
+  |None->Printf.printf "il a PAS trouver l'arc %d %d " ids idd;{src=ids ;tgt=idd ;lbl=0}
+  |Some arci-> Printf.printf "il a trouver l'arc %d %d lbl=%d" ids idd arci.lbl;{src=arci.src ;tgt=arci.tgt ;lbl=arci.lbl};;
 
 ;;
 (*let recup_label gr s d=(trouve_arc gr s d).lbl;;*)
@@ -101,7 +103,7 @@ let floyd gr s p=
     |[]->gr_flot
     |{src=ids;tgt=idd;lbl=lbla}::rest->begin
       let valeur=(trouve_arc gr ids idd).lbl - lbla in 
-      if valeur <> 0 then (boucle_arc1 rest (add_arc gr_flot ids idd valeur) gr) else (boucle_arc1 rest gr_flot gr)
+      if (valeur <> 0 ) then (boucle_arc1 rest (add_arc gr_flot ids idd valeur) gr) else (boucle_arc1 rest gr_flot gr)
     end
 in
 let rec boucle_arc2 liste_arc gr_flot gr=
@@ -119,10 +121,10 @@ in
     |[]->gr_flot
     |id::rest->boucle_flot (boucle_arc (out_arcs gr2 id) gr_flot gr) gr2 rest
 in
-  let rec boucle_parcours parcours valeur gr2=
+  let rec boucle_parcours parcours valeur gr2 gr_flot=
     match parcours with
     |[]->gr2
-    |(n,p)::rest->boucle_parcours rest valeur (add_arc gr2 p n (( (trouve_arc gr_flot p n).lbl/(abs (trouve_arc gr_flot p n).lbl ) ) *valeur ))
+    |(n,p)::rest->(Printf.printf " (%d,%d)" p n);boucle_parcours rest valeur (add_arc gr2 p n (( (trouve_arc gr_flot p n).lbl/(abs (trouve_arc gr_flot p n).lbl ) ) *valeur )) gr_flot
 
   in
   let rec val_min parcours v_min gr_flot=
@@ -131,9 +133,11 @@ in
     |(n,p)::rest->val_min rest (min v_min (abs (trouve_arc gr_flot p n).lbl) ) gr_flot
 in
 let rec boucle_while parcours gr2 gr_flot s p=
+
 if parcours <>[] then begin  
+    aff_visited parcours;
     let valeur=val_min parcours max_int gr_flot in
-    let gr2=boucle_parcours parcours valeur gr2 in
+    let gr2=boucle_parcours parcours valeur gr2 gr_flot in
     let gr_flot=boucle_flot (clone_nodes gr2) gr2 liste_node in
     let parcours=reverseliste (chemin (bfs gr_flot s) p) [] in
     boucle_while parcours gr2 gr_flot s p;
@@ -142,6 +146,9 @@ else gr2
 in
 let gr_flot=boucle_flot gr_flot gr2 liste_node in
 let parcours= reverseliste (chemin (bfs gr_flot s) p) [] in
+aff_visited parcours;
+write_file "temp" (gmap gr_flot string_of_int);
+
 boucle_while parcours gr2 gr_flot s p
 ;;
 
