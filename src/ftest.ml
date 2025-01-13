@@ -34,14 +34,14 @@ let () =
   let () = write_file outfile graph in
 
 
-  (*
+  
   let gr_sortie=floyd (gmap graph int_of_string) _source _sink in
   let () = write_file outfile (gmap gr_sortie string_of_int) in
   () ;;
-   *)
+ (*
 Printf.printf("avant l'erreur \n");
 let visited=bfs (gmap graph int_of_string) 0 in
 Printf.printf("je suis ici");
 aff_visited visited;
 ()
-;;
+;;*)
