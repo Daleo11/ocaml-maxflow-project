@@ -20,7 +20,7 @@ let visited=[(s,-1)]in
 let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
   match liste_n with
   |[]->file
-  |e::rest-> if (is_visited e visited)=false then (action rest (e::file) (n,p)::visited) else action rest file visited
+  |e::rest-> if (is_visited e visited)=false then (action rest (e::file) (e::visited)) else action rest file visited
 in
 let rec boucle file visited =
   match file with
