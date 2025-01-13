@@ -23,15 +23,18 @@ let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
 Printf.printf("Dans action\n");
 aff_visited visited; 
 aff_visited liste_n;
+aff_visited file;
 match liste_n with
-  |[]->file
+  |[]->(file,visited)
   |(n,p)::rest-> Printf.printf" (%d , %d)-> %b\n  " n p (is_visited (n,p) visited) ;if (is_visited (n,p) visited)=false then (action rest ((n,p)::file) ((n,p)::visited)) else action rest file visited
 in
 let rec boucle file visited =
   Printf.printf("Dans la boucle\n");
+  aff_visited visited;
+  aff_visited file;
   match file with
-  |(n,p)::rest ->let nv_file=action (list_node_dest (out_arcs gr n) []) [] visited in
-                boucle (nv_file@rest) ((n,p)::visited)
+  |(n,_)::rest ->let (nv_file,visited)=action (list_node_dest (out_arcs gr n) []) [] visited in
+                boucle (nv_file@rest) (visited)
   |[]->visited
 in
 boucle file visited
