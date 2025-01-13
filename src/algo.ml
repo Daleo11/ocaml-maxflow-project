@@ -125,15 +125,15 @@ in
 let rec boucle_while parcours gr2 gr_flot s p=
 if parcours <>[] then begin  
     let valeur=val_min parcours max_int gr_flot in
-    gr2=boucle_parcours parcours valeur gr2;
-    gr_flot=boucle_flot (clone_nodes gr2) gr2 liste_node;
-    parcours=reverseliste (chemin (bfs gr_flot s p) p) [];
+    let gr2=boucle_parcours parcours valeur gr2 in
+    let gr_flot=boucle_flot (clone_nodes gr2) gr2 liste_node in
+    let parcours=reverseliste (chemin (bfs gr_flot s p) p) [] in
     boucle_while parcours gr2 gr_flot s p;
-end
-gr2
+  end
+else gr2
 in
-gr_flot=boucle_flot gr_flot gr2 liste_node
-parcours= reverseliste (chemin (bfs gr_flot s p) p) []
+let gr_flot=boucle_flot gr_flot gr2 liste_node in
+let parcours= reverseliste (chemin (bfs gr_flot s p) p) [] in
 boucle_while parcours gr2 gr_flot s p
 ;;
 
