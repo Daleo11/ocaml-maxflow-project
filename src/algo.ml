@@ -31,9 +31,9 @@ in
 boucle file visited
 ;;
 
-let rec recup_nodes_gr gr acu=match gr with
-|(id,_)::rest->recup_nodes_gr	rest (id::acu)
-|[]->acu;;
+let recup_nodes_gr gr =
+n_fold gr (fun acu e ->e::acu) [] 
+;;
 
 let rec recup_node_visited visited node=
 match visited with
@@ -60,43 +60,51 @@ match liste with
 (*floyd*)
 
 let rec trouve_arc gr ids idd=
-match gr with
-|[]->{src=ids;tgt=idd;lbl=0}  
-|(_,{src=id;tgt=id2;lbl=a})::rest->if ((id=ids) && (id2=idd)) then {src=id;tgt=id2;lbl=a} else trouve_arc rest ids idd
+match (find_arc gr ids idd) with
+  |None->{src=idd ;tgt=idd ;lbl=0}
+  |Some arci-> {src=arci.src ;tgt=arci.tgt ;lbl=arci.lbl};;
 
 ;;
 let recup_label gr s d=(trouve_arc gr s d).lbl;;
 
-let gmap2 gr f=
+(*let gmap2 gr f=
 let transfo g arc=new_arc g {src = arc.src ;tgt=arc.tgt; lbl=(f arc.lbl) }in
 let rec boucle_arc g2 liste_arc=
   match liste_arc with
   |[]->g2
   |e::rest->boucle_arc (transfo g2 e) rest 
 in
-let rec boucle_node gr g2=
+let rec boucle_node (gr:'a graph) g2=
   match gr with
   |[]->g2
-  |(id,listeoutarc)::rest->boucle_node rest (boucle_arc g2 listeoutarc)
+  |(_,listeoutarc)::rest->boucle_node rest (boucle_arc g2 listeoutarc)
 in
 let g2=clone_nodes gr in
-let liste_node=recup_nodes_gr gr [] in
-boucle_node liste_node gr g2
-;;
+boucle_node gr g2
+;;*)
 
-let floyd (gr:(id* 'a arc list)list) s p=
-  let liste_node=recup_nodes_gr gr [] in
-  let gr2=gmap2 gr (fun x->0) in
+let floyd gr s p=
+  let liste_node=recup_nodes_gr gr in
+  let gr2=gmap gr (fun x->0) in
   let gr_flot=clone_nodes gr2 in
-  let rec boucle_arc liste_arc gr_flot gr=
+  
+  let rec boucle_arc1 liste_arc gr_flot gr=
     match liste_arc with
     |[]->gr_flot
     |{src=ids;tgt=idd;lbl=lbla}::rest->begin
-      let valeur=(find_arc gr ids idd).lbl - lbla in 
-      if valeur <> 0 then gr_flot=add_arc gr_flot ids idd valeur;
-      if lbla <> 0 then gr_flot=add_arc gr_flot idd ids (-lbla);
-      boucle_arc rest gr_flot gr;
+      let valeur=(trouve_arc gr ids idd).lbl - lbla in 
+      if valeur <> 0 then (boucle_arc1 rest (add_arc gr_flot ids idd valeur) gr) else (boucle_arc1 rest gr_flot gr)
     end
+in
+let rec boucle_arc2 liste_arc gr_flot gr=
+    match liste_arc with
+    |[]->gr_flot
+    |{src=ids;tgt=idd;lbl=lbla}::rest->
+      if lbla <> 0 then (boucle_arc2 rest (add_arc gr_flot idd ids (-lbla)) gr) else (boucle_arc2 rest gr_flot gr)
+
+in
+let boucle_arc liste_arc gr_flot gr=
+  boucle_arc2 liste_arc (boucle_arc1 liste_arc gr_flot gr) gr
 in
   let rec boucle_flot gr_flot gr2 liste_node =
     match liste_node with
@@ -105,13 +113,14 @@ in
 in
   let rec boucle_parcours parcours valeur gr2=
     match parcours with
-    |(n,-1)::[]->gr2
-    |(n,p)::rest->boucle_parcours rest valeur (add_arc gr2 p n ( (find_arc gr_flot p n).lbl/(abs (find_arc gr_flot p n).lbl ) ) *valeur )
-in
+    |[]->gr2
+    |(n,p)::rest->boucle_parcours rest valeur (add_arc gr2 p n (( (trouve_arc gr_flot p n).lbl/(abs (trouve_arc gr_flot p n).lbl ) ) *valeur ))
+
+  in
   let rec val_min parcours v_min gr_flot=
     match parcours with
     |[]->v_min
-    |(n,p)::rest->val_min rest (min v_min (abs (find_arc gr_flot p n).lbl) )
+    |(n,p)::rest->val_min rest (min v_min (abs (trouve_arc gr_flot p n).lbl) ) gr_flot
 in
 let rec boucle_while parcours gr2 gr_flot s p=
 if parcours <>[] then begin  
