@@ -67,9 +67,26 @@ match gr with
 ;;
 let recup_label gr s d=(trouve_arc gr s d).lbl;;
 
+let gmap2 gr f=
+let transfo g arc=new_arc g {src = arc.src ;tgt=arc.tgt; lbl=(f arc.lbl) }in
+let rec boucle_arc g2 liste_arc=
+  match liste_arc with
+  |[]->g2
+  |e::rest->boucle_arc (transfo g2 e) rest 
+in
+let rec boucle_node gr g2=
+  match gr with
+  |[]->g2
+  |(id,listeoutarc)::rest->boucle_node rest (boucle_arc g2 listeoutarc)
+in
+let g2=clone_nodes gr in
+let liste_node=recup_nodes_gr gr [] in
+boucle_node liste_node gr g2
+;;
+
 let floyd (gr:(id* 'a arc list)list) s p=
   let liste_node=recup_nodes_gr gr [] in
-  let gr2=gmap gr (fun x->0) in
+  let gr2=gmap2 gr (fun x->0) in
   let gr_flot=clone_nodes gr2 in
   let rec boucle_arc liste_arc gr_flot gr=
     match liste_arc with
