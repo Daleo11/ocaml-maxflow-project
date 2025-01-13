@@ -1,6 +1,6 @@
 open Graph
 open Tools
-(*open Gfile*)
+open Gfile
 
 let rec list_node_dest arcliste acu=
 match arcliste with
@@ -124,8 +124,10 @@ in
   let rec boucle_parcours parcours valeur gr2 gr_flot=
     match parcours with
     |[]->gr2
-    |(n,p)::rest->(*(Printf.printf " (%d,%d)" p n);*)boucle_parcours rest valeur (add_arc gr2 p n (( (trouve_arc gr_flot p n).lbl/(abs (trouve_arc gr_flot p n).lbl ) ) *valeur )) gr_flot
-
+    |(n,p)::rest->(*(Printf.printf " (%d,%d)" p n);*)begin
+      if (trouve_arc gr_flot p n).lbl >0 then boucle_parcours rest valeur (add_arc gr2 p n valeur) gr_flot
+      else boucle_parcours rest valeur (add_arc gr2 n p(-valeur) ) gr_flot
+    end
   in
   let rec val_min parcours v_min gr_flot=
     match parcours with
@@ -147,7 +149,7 @@ in
 let gr_flot=boucle_flot gr_flot gr2 liste_node in
 let parcours= reverseliste (chemin (bfs gr_flot s) p) [] in
 (*aff_visited parcours;*)
-(*write_file "temp" (gmap gr_flot string_of_int);*)
+write_file "temp" (gmap gr_flot string_of_int);
 
 boucle_while parcours gr2 gr_flot s p
 ;;
