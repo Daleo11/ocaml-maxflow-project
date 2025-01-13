@@ -1,3 +1,3 @@
 open Graph
 
-val floyd: 'a graph -> id -> id ->'a graph
+val floyd: int graph -> id -> id ->int graph

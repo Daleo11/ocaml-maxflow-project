@@ -10,11 +10,11 @@ match arcliste with
 let rec is_visited (node,prec:id*id) (visited:(id*id)list)=
 match visited with
 | [] -> false
-| (n,p)::rest -> (n=node) || (is_visited (node,prec) rest);;
+| (n,_)::rest -> (n=node) || (is_visited (node,prec) rest);;
 
 (*parcours en largeur, graph source puit*)
 
-let bfs gr s p=
+let bfs gr s=
 let file =[(s,-1)] in
 let visited=[]in
 let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
@@ -42,7 +42,6 @@ match visited with
 
 (*on met pas la source car c'est la meme pour tt l'algo*)
 let chemin visited d=
-let res=[]in
 let rec boucle_while liste node_prec = 
     match node_prec with
     |(x,y)->if x=y then liste else (boucle_while ((x,y)::liste) (recup_node_visited visited y) )
@@ -59,13 +58,13 @@ match liste with
 
 (*floyd*)
 
-let rec trouve_arc gr ids idd=
+let trouve_arc gr ids idd=
 match (find_arc gr ids idd) with
   |None->{src=idd ;tgt=idd ;lbl=0}
   |Some arci-> {src=arci.src ;tgt=arci.tgt ;lbl=arci.lbl};;
 
 ;;
-let recup_label gr s d=(trouve_arc gr s d).lbl;;
+(*let recup_label gr s d=(trouve_arc gr s d).lbl;;*)
 
 (*let gmap2 gr f=
 let transfo g arc=new_arc g {src = arc.src ;tgt=arc.tgt; lbl=(f arc.lbl) }in
@@ -85,7 +84,7 @@ boucle_node gr g2
 
 let floyd gr s p=
   let liste_node=recup_nodes_gr gr in
-  let gr2=gmap gr (fun x->0) in
+  let gr2=gmap gr (fun x->x*0) in
   let gr_flot=clone_nodes gr2 in
   
   let rec boucle_arc1 liste_arc gr_flot gr=
@@ -127,13 +126,13 @@ if parcours <>[] then begin
     let valeur=val_min parcours max_int gr_flot in
     let gr2=boucle_parcours parcours valeur gr2 in
     let gr_flot=boucle_flot (clone_nodes gr2) gr2 liste_node in
-    let parcours=reverseliste (chemin (bfs gr_flot s p) p) [] in
+    let parcours=reverseliste (chemin (bfs gr_flot s) p) [] in
     boucle_while parcours gr2 gr_flot s p;
   end
 else gr2
 in
 let gr_flot=boucle_flot gr_flot gr2 liste_node in
-let parcours= reverseliste (chemin (bfs gr_flot s p) p) [] in
+let parcours= reverseliste (chemin (bfs gr_flot s) p) [] in
 boucle_while parcours gr2 gr_flot s p
 ;;
 

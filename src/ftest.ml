@@ -1,5 +1,6 @@
 open Gfile
 open Algo
+open Tools
     
 let () =
 
@@ -33,6 +34,6 @@ let () =
   (*let () = write_file outfile graph in
 
   ()*)
-  let gr_sortie=floyd graph _source _sink in
-  let () = write_file outfile gr_sortie in
+  let gr_sortie=floyd (gmap graph int_of_string) _source _sink in
+  let () = write_file outfile (gmap gr_sortie string_of_int) in
   () ;;
