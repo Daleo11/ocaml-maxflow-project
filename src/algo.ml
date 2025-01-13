@@ -16,15 +16,15 @@ match visited with
 
 let bfs gr s=
 let file =[(s,-1)] in
-let visited=[]in
+let visited=[(s,-1)]in
 let rec action (liste_n:(id*id)list) (file:(id*id)list)  (visited:(id*id)list) =
   match liste_n with
   |[]->file
-  |e::rest-> if (is_visited e visited)=false then (action rest (e::file) visited) else action rest file visited
+  |e::rest-> if (is_visited e visited)=false then (action rest (e::file) (n,p)::visited) else action rest file visited
 in
 let rec boucle file visited =
   match file with
-  |(n,p)::rest ->let nv_file=action (list_node_dest (out_arcs gr n) []) file ((n,p)::visited) in
+  |(n,p)::rest ->let nv_file=action (list_node_dest (out_arcs gr n) []) file visited in
                 boucle (nv_file@rest) ((n,p)::visited)
   |[]->visited
 in
