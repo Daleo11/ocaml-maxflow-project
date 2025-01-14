@@ -36,13 +36,10 @@ let () =
 
   
   let gr_sortie=floyd (gmap graph int_of_string) _source _sink in
+  Printf.printf"flot max -> %d \n" (flot_max gr_sortie _source);
   let () = write_file outfile (gmap gr_sortie string_of_int) in
   let ()=export (gmap gr_sortie string_of_int) _source _sink outfile in
   () ;;
- (*
-Printf.printf("avant l'erreur \n");
-let visited=bfs (gmap graph int_of_string) 0 in
-Printf.printf("je suis ici");
-aff_visited visited;
-()
-;;*)
+
+
+
